@@ -29,7 +29,8 @@ import Footer from '@/components/footer/Footer';
 import ShowGoods from '@/components/goodsDetail/ShowGoods';
 import ShowGoodsDetail from '@/components/goodsDetail/ShowGoodsDetail';
 import store from '@/vuex/store';
-import { mapState, mapActions } from 'vuex';
+import { mapState, mapActions, mapMutations } from 'vuex';
+import { getGoodsInfo } from '../api/index';
 export default {
   name: 'GoodsDetail',
   beforeRouteEnter (to, from, next) {
@@ -37,15 +38,25 @@ export default {
     next();
   },
   created () {
-    this.loadGoodsInfo();
+    this.id = this.$route.query.id;
+    // this.loadGoodsInfo(this.id);
+    getGoodsInfo({goods_id: this.id}).then(
+      res => {
+        const data = res.data;
+        console.log(data);
+        this.SET_GOODS_INFO(data);
+      }
+    );
   },
   data () {
     return {
+      id: 0,
       tagsColor: [ 'blue', 'green', 'red', 'yellow' ]
     };
   },
   methods: {
-    ...mapActions(['loadGoodsInfo'])
+    ...mapActions(['loadGoodsInfo']),
+    ...mapMutations(['SET_GOODS_INFO'])
   },
   computed: {
     ...mapState(['goodsInfo', 'isLoading'])

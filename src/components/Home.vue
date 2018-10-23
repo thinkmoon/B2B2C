@@ -7,7 +7,7 @@
             <div class="user-img">
               <img src="static/img/head.png">
             </div>
-            <p>Gavin</p>
+            <p>{{userInfo.username}}</p>
           </div>
           <Submenu name="1">
             <template slot="title">
@@ -49,8 +49,16 @@
 </template>
 
 <script>
+import store from '@/vuex/store';
+import { mapState, mapActions } from 'vuex';
 export default {
   name: 'Home',
+  created () {
+    this.isLogin();
+  },
+  computed: {
+    ...mapState(['userInfo'])
+  },
   data () {
     return {
       activeTitle: '我的订单',
@@ -63,11 +71,13 @@ export default {
     };
   },
   methods: {
+    ...mapActions(['signOut', 'isLogin']),
     onSelect (name) {
       this.activeTitle = this.bar[name];
       this.$router.push(`/home/${name}`);
     }
-  }
+  },
+  store
 };
 </script>
 

@@ -10,7 +10,12 @@ module.exports = {
     // Paths
     assetsSubDirectory: 'static',
     assetsPublicPath: '/',
-    proxyTable: {},
+    proxyTable: {
+      '/api/': {
+        target: 'http://192.168.1.126/sx-b2b2c/public',  // 请求本地 需要clone node-api项目
+        changeOrigin: true
+      },
+    },
 
     // Various Dev Server settings
     host: 'localhost', // can be overwritten by process.env.HOST

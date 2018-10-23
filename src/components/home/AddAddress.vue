@@ -4,8 +4,8 @@
       <div class="add-title">
         <h1>添加收货地址</h1>
       </div>
+      <Form ref="formData" :model="formData" label-position="left" :label-width="100" :rules="ruleInline">
       <div class="add-box">
-        <Form :model="formData" label-position="left" :label-width="100" :rules="ruleInline">
           <FormItem label="收件人" prop="name">
             <i-input v-model="formData.name" size="large"></i-input>
           </FormItem>
@@ -21,26 +21,29 @@
           <FormItem label="邮政编码" prop="postalcode">
             <i-input v-model="formData.postalcode" size="large"></i-input>
           </FormItem>
-        </Form>
       </div>
       <div class="add-submit">
-        <Button type="primary">添加地址</Button>
+        <Button @click="addSubmit('formData')" type="primary">添加地址</Button>
       </div>
+      </Form>
     </div>
   </div>
 </template>
 
 <script>
+import store from '@/vuex/store';
+import { mapState } from 'vuex';
 import Distpicker from 'v-distpicker';
+import { addUserConsignee } from '../../api';
 export default {
   name: 'AddAddress',
   data () {
     return {
       formData: {
-        name: '',
-        address: '',
-        phone: '',
-        postalcode: '',
+        name: '李大嘴',
+        address: '东莞理工学院',
+        phone: '17666200123',
+        postalcode: '521800',
         province: '广东省',
         city: '广州市',
         area: '天河区'
@@ -62,6 +65,9 @@ export default {
       }
     };
   },
+  computed: {
+    ...mapState(['address', 'userInfo'])
+  },
   methods: {
     getProvince (data) {
       this.formData.province = data.value;
@@ -71,11 +77,33 @@ export default {
     },
     getArea (data) {
       this.formData.area = data.value;
+    },
+    addSubmit (name) {
+      this.$refs[name].validate((valid) => {
+        if (valid) {
+          const userAddress = {
+            receiver: this.formData.name,
+            user_id: this.userInfo.id,
+            province: this.formData.province,
+            city: this.formData.city,
+            area: this.formData.area,
+            address: this.formData.address,
+            mobile: this.formData.phone,
+            zip: this.formData.postalcode,
+            flag: 0
+          };
+          addUserConsignee(userAddress, this.userInfo.token);
+          this.$router.push({ path: '/home/myAddress' });
+        } else {
+          this.$Message.error('添加失败, 格式校验不通过');
+        }
+      });
     }
   },
   components: {
     Distpicker
-  }
+  },
+  store
 };
 </script>
 

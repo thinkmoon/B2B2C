@@ -27,8 +27,13 @@
 </template>
 
 <script>
+import store from '@/vuex/store';
+import { mapState } from 'vuex';
 export default {
   name: 'ShopHeader',
+  computed: {
+    ...mapState(['userInfo'])
+  },
   data () {
     return {
       shopIntro: {
@@ -50,7 +55,8 @@ export default {
         ]
       }
     };
-  }
+  },
+  store
 };
 </script>
 

@@ -25,8 +25,8 @@
                 选择地址
                 <p slot="content">
                   <RadioGroup vertical size="large" @on-change="changeAddress">
-                    <Radio :label="item.addressId" v-for="(item, index) in address" :key="index">
-                      <span>{{item.name}} {{item.province}} {{item.city}} {{item.address}} {{item.phone}} {{item.postalcode}}</span>
+                    <Radio :label="item.id" v-for="(item, index) in addressData" :key="index">
+                      <span>{{item.receiver}} {{item.province}} {{item.city}} {{item.address}} {{item.mobile}} {{item.postalcode}}</span>
                     </Radio>
                   </RadioGroup>
                 </p>
@@ -61,6 +61,7 @@ import GoodsListNav from '@/components/nav/GoodsListNav';
 import Footer from '@/components/footer/Footer';
 import store from '@/vuex/store';
 import { mapState, mapActions } from 'vuex';
+import { getUserConsignee, getShopping } from '../api/index';
 export default {
   name: 'Order',
   beforeRouteEnter (to, from, next) {
@@ -68,10 +69,25 @@ export default {
     next();
   },
   created () {
-    this.loadAddress();
+    getUserConsignee({user_id: this.userInfo.id}, this.userInfo.token).then(
+      res => {
+        if (res.code === -1) {
+          this.$Message.error('暂无信息，请先添加收获地址');
+        } else {
+          this.loadAddress(res.data);
+          this.addressData = res.data;
+        }
+      }
+    );
+    getShopping({user_id: this.userInfo.user_id}, {token: this.userInfo.token}).then(
+      res => {
+        this.loadShoppingCart(res.data);
+      }
+    );
   },
   data () {
     return {
+      addressData: [],
       goodsCheckList: [],
       columns: [
         {
@@ -87,7 +103,9 @@ export default {
             return h('div', [
               h('img', {
                 attrs: {
-                  src: params.row.img
+                  src: params.row.goods_image,
+                  class: 'img',
+                  style: 'display: inline-block;width: 70%;height: 70%;'
                 }
               })
             ]);
@@ -96,25 +114,19 @@ export default {
         },
         {
           title: '标题',
-          key: 'title',
-          align: 'center'
-        },
-        {
-          title: '套餐',
-          width: 198,
-          key: 'package',
+          key: 'goods_name',
           align: 'center'
         },
         {
           title: '数量',
-          key: 'count',
+          key: 'goods_num',
           width: 68,
           align: 'center'
         },
         {
           title: '价格',
           width: 68,
-          key: 'price',
+          key: 'goods_amount',
           align: 'center'
         }
       ],
@@ -126,27 +138,27 @@ export default {
     };
   },
   computed: {
-    ...mapState(['address', 'shoppingCart']),
+    ...mapState(['address', 'shoppingCart', 'userInfo']),
     totalPrice () {
       let price = 0;
       this.goodsCheckList.forEach(item => {
-        price += item.price * item.count;
+        price += item.goods_amount;
       });
       return price;
     }
   },
   methods: {
-    ...mapActions(['loadAddress']),
+    ...mapActions(['loadAddress', 'loadShoppingCart']),
     select (selection, row) {
       console.log(selection);
       this.goodsCheckList = selection;
     },
     changeAddress (data) {
       const father = this;
-      this.address.forEach(item => {
-        if (item.addressId === data) {
-          father.checkAddress.name = item.name;
-          father.checkAddress.address = `${item.name} ${item.province} ${item.city} ${item.address} ${item.phone} ${item.postalcode}`;
+      this.addressData.forEach(item => {
+        if (item.id === data) {
+          father.checkAddress.name = item.receiver;
+          father.checkAddress.address = `${item.receiver} ${item.province} ${item.city} ${item.address} ${item.mobile} ${item.zip}`;
         }
       });
     }

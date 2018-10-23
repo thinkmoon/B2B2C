@@ -26,3 +26,13 @@ export const seckillsMinutes = state => {
 export const seckillsSeconds = state => {
   return state.seckills.deadline.seconds < 10 ? `0${state.seckills.deadline.seconds}` : state.seckills.deadline.seconds;
 };
+
+// 地址
+export const getAddress = state => {
+  return state.address;
+};
+
+// 地址
+export const getUserInfo = state => {
+  return state.userInfo;
+};

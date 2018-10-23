@@ -38,6 +38,7 @@
 import Footer from '@/components/footer/Footer';
 import store from '@/vuex/store';
 import { mapMutations, mapActions } from 'vuex';
+import { login } from '../api/index';
 export default {
   name: 'Login',
   data () {
@@ -65,14 +66,30 @@ export default {
       console.log(this.formDate.username);
       this.$refs[name].validate((valid) => {
         if (valid) {
-          this.login(father.formDate).then(result => {
-            if (result) {
-              this.$Message.success('登陆成功');
-              father.$router.push('/');
-            } else {
-              this.$Message.error('用户名或密码错误');
+          login({account: this.formDate.username, password: this.formDate.password}).then(
+            res => {
+              if (res.code === 0) {
+                this.$Message.error(res.msg);
+              } else if (res.code === 1) {
+                this.$Message.success('登陆成功');
+                this.login(res.data).then(
+                  result => {
+                    father.$router.push('/');
+                  }
+                );
+              } else {
+                this.$Message.error('登录失败');
+              }
             }
-          });
+          );
+          // this.login(father.formDate).then(result => {
+          //   if (result) {
+          //     this.$Message.success('登陆成功');
+          //     father.$router.push('/');
+          //   } else {
+          //     this.$Message.error('用户名或密码错误');
+          //   }
+          // });
         } else {
           this.$Message.error('请填写正确的用户名或密码');
         }

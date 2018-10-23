@@ -13,8 +13,6 @@
           </BreadcrumbItem>
         </Breadcrumb>
       </div>
-      <!-- 商品标签导航 -->
-      <GoodsClassNav></GoodsClassNav>
       <!-- 商品展示容器 -->
       <div class="goods-box">
         <div class="as-box">
@@ -47,24 +45,24 @@
             </ul>
           </div>
           <div class="goods-list">
-            <div class="goods-show-info" v-for="(item, index) in orderGoodsList" :key="index">
+            <div class="goods-show-info" v-for="(item, index) in goodsList" :key="index">
               <div class="goods-show-img">
-                <router-link to="/goodsDetail"><img :src="item.img"/></router-link>
+                <router-link :to="{path:'/goodsDetail',query:{id:item.id}}" ><img :src="item.img == '' ? item.img : 'static/img/goodsList/item-show-6.jpg'"/></router-link>
               </div>
               <div class="goods-show-price">
                 <span>
                   <Icon type="social-yen text-danger"></Icon>
-                  <span class="seckill-price text-danger">{{item.price}}</span>
+                  <span class="seckill-price text-danger">{{item.now_price}}</span>
                 </span>
               </div>
               <div class="goods-show-detail">
-                <span>{{item.intro}}</span>
+                <span>{{item.goods_content}}</span>
               </div>
               <div class="goods-show-num">
                 已有<span>{{item.remarks}}</span>人评价
               </div>
               <div class="goods-show-seller">
-                <span>{{item.shopName}}</span>
+                <span>{{item.goods_name}}</span>
               </div>
             </div>
           </div>
@@ -82,10 +80,10 @@
 <script>
 import Sreach from '@/components/Sreach';
 import GoodsListNav from '@/components/nav/GoodsListNav';
-import GoodsClassNav from '@/components/nav/GoodsClassNav';
 import Footer from '@/components/footer/Footer';
 import store from '@/vuex/store';
 import { mapState, mapActions, mapGetters, mapMutations } from 'vuex';
+import { getCateGoods } from '../api/index';
 export default {
   name: 'GoodsList',
   beforeRouteEnter (to, from, next) {
@@ -94,6 +92,7 @@ export default {
   },
   data () {
     return {
+      cateID: 0,
       sreachItem: '',
       isAction: [ true, false, false ],
       icon: [ 'arrow-up-a', 'arrow-down-a', 'arrow-down-a' ],
@@ -101,7 +100,8 @@ export default {
         {title: '综合', en: 'sale'},
         {title: '评论数', en: 'remarks'},
         {title: '价格', en: 'price'}
-      ]
+      ],
+      goodsList: []
     };
   },
   computed: {
@@ -121,15 +121,21 @@ export default {
     }
   },
   created () {
-    this.loadGoodsList();
+    // this.loadGoodsList();
   },
   mounted () {
     this.sreachItem = this.$route.query.sreachData;
+    this.cateID = this.$route.query.aim;
+    getCateGoods({cate_id: this.cateID}).then(
+      res => {
+        console.log(res.data);
+        this.goodsList = res.data;
+      }
+    );
   },
   components: {
     Sreach,
     GoodsListNav,
-    GoodsClassNav,
     Footer
   },
   store

@@ -1,18 +1,18 @@
 <template>
   <div>
-    <div class="address-box" v-for="(item, index) in address" :key="index">
+    <div class="address-box" v-for="(item, index) in addressData" :key="index">
       <div class="address-header">
-        <span>{{item.name}}</span>
+        <span>{{item.receiver}}</span>
         <div class="address-action">
           <span @click="edit(index)"><Icon type="edit"></Icon> 修改</span>
           <span @click="del(index)"><Icon type="trash-a"></Icon> 删除</span>
         </div>
       </div>
       <div class="address-content">
-        <p><span class="address-content-title"> 收 货 人 :</span> {{item.name}}</p>
+        <p><span class="address-content-title"> 收 货 人 :</span> {{item.receiver}}</p>
         <p><span class="address-content-title">收货地区:</span> {{item.province}} {{item.city}} {{item.area}}</p>
         <p><span class="address-content-title">收货地址:</span> {{item.address}}</p>
-        <p><span class="address-content-title">邮政编码:</span> {{item.postalcode}}</p>
+        <p><span class="address-content-title">邮政编码:</span> {{item.zip}}</p>
       </div>
     </div>
     <Modal v-model="modal" width="530">
@@ -23,10 +23,10 @@
         <div>
             <Form :model="formData" label-position="left" :label-width="100" :rules="ruleInline">
               <FormItem label="收件人" prop="name">
-                <i-input v-model="formData.name" size="large"></i-input>
+                <i-input v-model="formData.receiver" size="large"></i-input>
               </FormItem>
               <FormItem label="收件地区" prop="address">
-                <Distpicker :province="formData.province" :city="formData.city" :area="formData.area" @province="getProvince" @city="getCity" @area="getArea"></Distpicker>
+                <!-- <Distpicker :province="formData.province" :city="formData.city" :area="formData.area" @province="getProvince" @city="getCity" @area="getArea"></Distpicker> -->
               </FormItem>
               <FormItem label="收件地址" prop="address">
                 <i-input v-model="formData.address" size="large"></i-input>
@@ -48,12 +48,14 @@
 
 <script>
 import store from '@/vuex/store';
-import { mapState, mapActions } from 'vuex';
+import { mapState, mapActions, mapMutations, mapGetters } from 'vuex';
 import Distpicker from 'v-distpicker';
+import { getUserConsignee } from '../../api/index';
 export default {
   name: 'MyAddress',
   data () {
     return {
+      addressData: [],
       modal: false,
       formData: {
         name: '',
@@ -81,14 +83,25 @@ export default {
       }
     };
   },
-  created () {
-    this.loadAddress();
+  mounted () {
+    getUserConsignee({user_id: this.userInfo.id}, this.userInfo.token).then(
+      res => {
+        if (res.code === -1) {
+          this.$Message.error('暂无信息，请先添加收获地址');
+        } else {
+          this.addressData = res.data;
+          console.log(this.addressData);
+        }
+      }
+    );
   },
   computed: {
-    ...mapState(['address'])
+    ...mapState(['address', 'userInfo']),
+    ...mapGetters(['getAddress'])
   },
   methods: {
     ...mapActions(['loadAddress']),
+    ...mapMutations(['SET_USER_ADDRESS', 'GET_USER_ADDRESS']),
     edit (index) {
       this.modal = true;
       this.formData.province = this.address[index].province;

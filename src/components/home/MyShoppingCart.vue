@@ -10,6 +10,7 @@
 <script>
 import store from '@/vuex/store';
 import { mapState, mapActions } from 'vuex';
+import { getShopping } from '../../api/index';
 export default {
   name: 'MyShoppingCart',
   data () {
@@ -28,7 +29,9 @@ export default {
             return h('div', [
               h('img', {
                 attrs: {
-                  src: params.row.img
+                  src: params.row.goods_image,
+                  class: 'img',
+                  style: 'display: inline-block;width: 70%;height: 70%;'
                 }
               })
             ]);
@@ -37,35 +40,33 @@ export default {
         },
         {
           title: '标题',
-          key: 'title',
-          align: 'center'
-        },
-        {
-          title: '套餐',
-          width: 198,
-          key: 'package',
+          key: 'goods_name',
           align: 'center'
         },
         {
           title: '数量',
-          key: 'count',
+          key: 'goods_num',
           width: 68,
           align: 'center'
         },
         {
           title: '价格',
           width: 68,
-          key: 'price',
+          key: 'goods_amount',
           align: 'center'
         }
       ]
     };
   },
   created () {
-    this.loadShoppingCart();
+    getShopping({user_id: this.userInfo.user_id}, {token: this.userInfo.token}).then(
+      res => {
+        this.loadShoppingCart(res.data);
+      }
+    );
   },
   computed: {
-    ...mapState(['shoppingCart'])
+    ...mapState(['shoppingCart', 'userInfo'])
   },
   methods: {
     ...mapActions(['loadShoppingCart']),

@@ -3,7 +3,7 @@
     <div class="item-detail-show">
       <div class="item-detail-left">
         <div class="item-detail-big-img">
-          <img :src="goodsInfo.goodsImg[imgIndex]" alt="">
+          <img :src="goodsInfo.goods_image == '' ? goodsInfo.goods_image : 'static/img/goodsList/item-show-6.jpg'" alt="">
         </div>
         <div class="item-detail-img-row">
           <div class="item-detail-img-small" v-for="(item, index) in goodsInfo.goodsImg" :key="index" @mouseover="showBigImg(index)">
@@ -14,31 +14,25 @@
       <div class="item-detail-right">
         <div class="item-detail-title">
           <p>
-            <span class="item-detail-express">校园配送</span> {{goodsInfo.title}}</p>
+            <span class="item-detail-express">校园配送</span> {{goodsInfo.goods_name}}</p>
         </div>
         <div class="item-detail-tag">
           <p>
-            <span v-for="(item,index) in goodsInfo.tags" :key="index">【{{item}}】</span>
+            <span v-for="(item,index) in goodsInfo.category" :key="index">【{{item}}】</span>
           </p>
         </div>
         <div class="item-detail-price-row">
           <div class="item-price-left">
             <div class="item-price-row">
               <p>
-                <span class="item-price-title">B I T 价</span>
-                <span class="item-price">￥{{price.toFixed(2)}}</span>
-              </p>
-            </div>
-            <div class="item-price-row">
-              <p>
-                <span class="item-price-title">优 惠 价</span>
-                <span class="item-price-full-cut" v-for="(item,index) in goodsInfo.discount" :key="index">{{item}}</span>
+                <span class="item-price-title">原 价</span>
+                <span class="item-price">￥{{goodsInfo.original_price}}</span>
               </p>
             </div>
             <div class="item-price-row">
               <p>
                 <span class="item-price-title">促&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;销</span>
-                <span class="item-price-full-cut" v-for="(item,index) in goodsInfo.promotion" :key="index">{{item}}</span>
+                <span class="item-price-full-cut" >￥{{goodsInfo.now_price}}</span>
               </p>
             </div>
           </div>
@@ -46,7 +40,7 @@
             <div class="item-remarks-sum">
               <p>累计评价</p>
               <p>
-                <span class="item-remarks-num">{{goodsInfo.remarksNum}} 条</span>
+                <span class="item-remarks-num">{{goodsInfo.goods_no}} 条</span>
               </p>
             </div>
           </div>
@@ -54,19 +48,10 @@
         <!-- 选择颜色 -->
         <div class="item-select">
           <div class="item-select-title">
-            <p>选择颜色</p>
+            <p>商品描述</p>
           </div>
           <div class="item-select-column">
-            <div class="item-select-row" v-for="(items, index) in goodsInfo.setMeal" :key="index">
-              <div class="item-select-box" v-for="(item, index1) in items" :key="index1" @click="select(index, index1)" :class="{'item-select-box-active': ((index * 3) + index1) === selectBoxIndex}">
-                <div class="item-select-img">
-                  <img :src="item.img" alt="">
-                </div>
-                <div class="item-select-intro">
-                  <p>{{item.intro}}</p>
-                </div>
-              </div>
-            </div>
+            {{goodsInfo.goods_content}}
           </div>
         </div>
         <!-- 白条分期 -->
@@ -97,6 +82,7 @@
 <script>
 import store from '@/vuex/store';
 import { mapState, mapActions } from 'vuex';
+import { addShopping } from '../../api/index';
 export default {
   name: 'ShowGoods',
   data () {
@@ -108,7 +94,7 @@ export default {
     };
   },
   computed: {
-    ...mapState(['goodsInfo']),
+    ...mapState(['goodsInfo', 'userInfo']),
     hirePurchase () {
       const three = this.price * this.count / 3;
       const sex = this.price * this.count / 6;
@@ -148,25 +134,19 @@ export default {
       this.imgIndex = index;
     },
     addShoppingCartBtn () {
-      const index1 = parseInt(this.selectBoxIndex / 3);
-      const index2 = this.selectBoxIndex % 3;
-      const date = new Date();
-      const goodsId = date.getTime();
-      const data = {
-        goods_id: goodsId,
-        title: this.goodsInfo.title,
-        count: this.count,
-        package: this.goodsInfo.setMeal[index1][index2]
+      const requestData = {
+        user_id: this.userInfo.id,
+        admin_id: this.goodsInfo.admin_id,
+        goods_id: this.goodsInfo.id,
+        goods_num: this.count
       };
-      this.addShoppingCart(data);
-      this.$router.push('/shoppingCart');
+      addShopping(requestData);
+      this.$router.push({ path: '/home/myShoppingCart' });
     }
   },
   mounted () {
     const father = this;
-    setTimeout(() => {
-      father.price = father.goodsInfo.setMeal[0][0].price || 0;
-    }, 300);
+    console.log(father.goodsInfo);
   },
   store
 };

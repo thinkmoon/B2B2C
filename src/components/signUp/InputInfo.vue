@@ -21,6 +21,7 @@
 <script>
 import store from '@/vuex/store';
 import { mapMutations, mapActions } from 'vuex';
+import { register } from '../../api/index';
 export default {
   name: 'InputInfo',
   data () {
@@ -65,16 +66,24 @@ export default {
       const father = this;
       this.$refs[name].validate((valid) => {
         if (valid) {
-          this.$Message.success('注册成功');
           const userinfo = {
             username: this.formValidate.name,
             password: this.formValidate.password,
-            mail: this.formValidate.mail,
-            phone: this.$route.query.phone
+            email: this.formValidate.mail,
+            mobile: this.$route.query.phone
           };
-          this.addSignUpUser(userinfo);
-          father.SET_SIGN_UP_SETP(2);
-          this.$router.push({ path: '/SignUp/signUpDone' });
+          register(userinfo).then(
+            res => {
+              if (res.code === -1) {
+                this.$Message.error(res.msg);
+              } else if (res.code === 1) {
+                this.$Message.success('注册成功');
+                this.addSignUpUser(userinfo);
+                father.SET_SIGN_UP_SETP(2);
+                this.$router.push({ path: '/SignUp/signUpDone' });
+              }
+            }
+          );
         } else {
           this.$Message.error('注册失败');
         }

@@ -17,6 +17,7 @@
 <script>
 import store from '@/vuex/store';
 import { mapMutations } from 'vuex';
+import { sendSMS } from '../../api/index';
 export default {
   name: 'CheckPhone',
   data () {
@@ -32,20 +33,27 @@ export default {
         ],
         checkNum: [
           { required: true, message: '必须填写验证码', trigger: 'blur' },
-          { type: 'string', min: 4, max: 4, message: '验证码长度错误', trigger: 'blur' }
+          { type: 'string', min: 6, max: 6, message: '验证码长度错误', trigger: 'blur' }
         ]
       }
     };
   },
   methods: {
     ...mapMutations(['SET_SIGN_UP_SETP']),
+    ...mapMutations(['SET_PHONE']),
     getcheckNum () {
       if (this.formValidate.phone.length === 11) {
-        this.$Message.success({
-          content: '验证码为: 1234',
-          duration: 6,
-          closable: true
-        });
+        sendSMS({mobile: this.formValidate.phone, event: 'register'}).then(
+          res => {
+            if (res.code === 1) {
+              this.$Message.success({
+                content: '验证码为: 123456',
+                duration: 6,
+                closable: true
+              });
+            }
+          }
+        );
       } else {
         this.$Message.error({
           content: '请输入正确的手机号',
@@ -59,6 +67,7 @@ export default {
         if (valid) {
           this.$router.push({ path: '/SignUp/inputInfo', query: { phone: this.formValidate.phone } });
           this.SET_SIGN_UP_SETP(1);
+          this.SET_PHONE(this.formValidate.phone);
         } else {
           this.$Message.error({
             content: '请填写正确的信息',

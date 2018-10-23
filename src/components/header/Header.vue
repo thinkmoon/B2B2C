@@ -102,6 +102,7 @@ export default {
   name: 'M-Header',
   created () {
     this.isLogin();
+    this.loadShoppingCartSync();
   },
   data () {
     return {
@@ -118,7 +119,7 @@ export default {
     ...mapState(['userInfo', 'shoppingCart'])
   },
   methods: {
-    ...mapActions(['signOut', 'isLogin']),
+    ...mapActions(['signOut', 'isLogin', 'loadShoppingCartSync']),
     changeCity (city) {
       this.city = city;
     },
