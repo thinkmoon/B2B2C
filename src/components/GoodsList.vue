@@ -1,6 +1,6 @@
 <template>
   <div>
-    <Sreach></Sreach>
+    <Search></Search>
     <GoodsListNav></GoodsListNav>
     <div class="container">
       <div class="bread-crumb">
@@ -8,8 +8,8 @@
           <BreadcrumbItem to="/">
             <Icon type="ios-home-outline"></Icon> 首页
           </BreadcrumbItem>
-          <BreadcrumbItem to="/goodsList?sreachData=">
-            <Icon type="bag"></Icon> {{sreachItem}}
+          <BreadcrumbItem to="/goodsList?SearchData=">
+            <Icon type="bag"></Icon> {{SearchItem}}
           </BreadcrumbItem>
         </Breadcrumb>
       </div>
@@ -45,7 +45,7 @@
             </ul>
           </div>
           <div class="goods-list">
-            <div class="goods-show-info" v-for="(item, index) in goodsList" :key="index">
+            <div class="goods-show-info" v-for="(item, index) in goodsList.data" :key="index">
               <div class="goods-show-img">
                 <router-link :to="{path:'/goodsDetail',query:{id:item.id}}" ><img :src="item.img == '' ? item.img : 'static/img/goodsList/item-show-6.jpg'"/></router-link>
               </div>
@@ -78,12 +78,12 @@
 </template>
 
 <script>
-import Sreach from '@/components/Sreach';
+import Search from '@/components/Search';
 import GoodsListNav from '@/components/nav/GoodsListNav';
 import Footer from '@/components/footer/Footer';
 import store from '@/vuex/store';
 import { mapState, mapActions, mapGetters, mapMutations } from 'vuex';
-import { getCateGoods } from '../api/index';
+import { getCateGoods, searchGoods } from '../api/index';
 export default {
   name: 'GoodsList',
   beforeRouteEnter (to, from, next) {
@@ -93,7 +93,7 @@ export default {
   data () {
     return {
       cateID: 0,
-      sreachItem: '',
+      SearchItem: '',
       isAction: [ true, false, false ],
       icon: [ 'arrow-up-a', 'arrow-down-a', 'arrow-down-a' ],
       goodsTool: [
@@ -103,6 +103,26 @@ export default {
       ],
       goodsList: []
     };
+  },
+  beforeRouteUpdate (to, from, next) {
+    this.searchItem = to.query.searchData;
+    if (this.searchItem) {
+      searchGoods({search: this.searchItem}).then(
+        res => {
+          this.goodsList = res.data;
+        }
+      );
+    }
+    this.cateID = to.query.aim;
+    if (this.cateID) {
+      getCateGoods({cate_id: this.cateID}).then(
+        res => {
+          console.log(res.data);
+          this.goodsList = res.data;
+        }
+      );
+    }
+    next();
   },
   computed: {
     ...mapState(['asItems', 'isLoading']),
@@ -124,17 +144,26 @@ export default {
     // this.loadGoodsList();
   },
   mounted () {
-    this.sreachItem = this.$route.query.sreachData;
+    this.searchItem = this.$route.query.searchData;
+    if (this.searchItem) {
+      searchGoods({search: this.searchItem}).then(
+        res => {
+          this.goodsList = res.data;
+        }
+      );
+    }
     this.cateID = this.$route.query.aim;
-    getCateGoods({cate_id: this.cateID}).then(
-      res => {
-        console.log(res.data);
-        this.goodsList = res.data;
-      }
-    );
+    if (this.cateID) {
+      getCateGoods({cate_id: this.cateID}).then(
+        res => {
+          console.log(res.data);
+          this.goodsList = res.data;
+        }
+      );
+    }
   },
   components: {
-    Sreach,
+    Search,
     GoodsListNav,
     Footer
   },

@@ -12,7 +12,7 @@ module.exports = {
     assetsPublicPath: '/',
     proxyTable: {
       '/api/': {
-        target: 'http://192.168.1.126/sx-b2b2c/public',  // 请求本地 需要clone node-api项目
+        target: 'https://b2b2c.bennyweb.top',  // 请求本地 需要clone node-api项目
         changeOrigin: true
       },
     },

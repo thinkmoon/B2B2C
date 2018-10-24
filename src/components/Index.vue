@@ -1,6 +1,6 @@
 <template>
   <div class="container">
-    <Sreach></Sreach>
+    <Search></Search>
     <HomeNav></HomeNav>
     <!-- 商品显示区域 -->
     <div class="content">
@@ -27,15 +27,15 @@
         </div>
         <!-- 内容 -->
         <div class="seckill-content">
-          <div class="seckill-item" v-for="(item, index) in seckills.goodsList" :key="index">
+          <div class="seckill-item" v-for="(item, index) in seckills.goodsList.data" :key="index">
             <div class="seckill-item-img">
-              <router-link to="/goodsList"><img :src="item.img"></router-link>
+              <router-link :to="{path:'/goodsDetail',query:{id:item.id}}"><img :src="item.goods_image"></router-link>
             </div>
             <div class="seckill-item-info">
-              <p>{{item.intro}}</p>
+              <p>{{item.goods_name}}</p>
               <p>
-                <span class="seckill-price text-danger"><Icon type="social-yen"></Icon>{{item.price}}</span>
-                <span class="seckill-old-price"><s>{{item.realPrice}}</s></span>
+                <span class="seckill-price text-danger"><Icon type="social-yen"></Icon>{{item.now_price}}</span>
+                <span class="seckill-old-price"><s>{{item.original_price}}</s></span>
               </p>
             </div>
           </div>
@@ -44,78 +44,36 @@
       <!-- 电脑专场 -->
       <div class="item-class">
         <div class="item-class-head">
-          <span class="item-class-title">{{computer.title}}</span>
+          <span class="item-class-title">新品推荐</span>
           <ul>
-            <li v-for="(item, index) in computer.link" :key="index">
-              <router-link to="/goodsList">{{item}}</router-link>
+            <li v-for="(item, index) in New.data" :key="index">
+              <router-link :to="{path:'/goodsDetail',query:{id:item.id}}">{{item.goods_name}}</router-link>
             </li>
           </ul>
         </div>
-        <div class="item-class-content" v-for="(item, index) in computer.detail" :key="index">
-          <div class="item-content-top">
-            <div class="item-big-img">
-              <router-link to="/goodsList">
-                <img :src="item.bigImg" alt="">
-              </router-link>
+        <div class="item-class-content" v-for="(item, index) in New.data" :key="index" v-show="index < 2">
+          <div class="item-big-img">
+              <router-link :to="{path:'/goodsDetail',query:{id:item.id}}">
+              <img :src="item.goods_image" alt="">
+            </router-link>
             </div>
-            <div class="item-four-img">
-              <div class="item-four-detail" v-for="(subItem, index) in item.itemFour" :key="index">
-                <div class="item-four-detail-text">
-                  <p class="pt_bi_tit">{{subItem.title}}</p>
-                  <p class="pt_bi_promo">{{subItem.intro}}</p>
-                </div>
-                <div class="item-four-detail-img">
-                  <router-link to="/goodsList">
-                    <img :src="subItem.img" alt="">
-                  </router-link>
-                </div>
-              </div>
-            </div>
-          </div>
-          <div class="item-content-bottom">
-            <div class="item-content-bottom-img" v-for="(subImg, index) in item.itemContent" :key="index">
-              <router-link to="/goodsList">
-                <img :src="subImg">
-              </router-link>
-            </div>
-          </div>
         </div>
       </div>
       <!-- 爱吃专场 -->
       <div class="item-class">
         <div class="item-class-head item-class-eat-head">
-          <span class="item-class-title">{{eat.title}}</span>
+          <span class="item-class-title">为您推荐</span>
           <ul>
-            <li v-for="(item, index) in eat.link" :key="index">
-              <router-link to="/goodsList">{{item}}</router-link>
+            <li v-for="(item, index) in Recommend.data" :key="index">
+              <router-link :to="{path:'/goodsDetail',query:{id:item.id}}">{{item.goods_name}}</router-link>
             </li>
           </ul>
         </div>
-        <div class="item-class-content" v-for="(item, index) in eat.detail" :key="index">
-          <div class="item-content-top">
-            <div class="item-big-img">
-              <img :src="item.bigImg" alt="">
-            </div>
-            <div class="item-four-img">
-              <div class="item-four-detail" v-for="(subItem, index) in item.itemFour" :key="index">
-                <div class="item-four-detail-text">
-                  <p class="pt_bi_tit pt_bi_tit-eat">{{subItem.title}}</p>
-                  <p class="pt_bi_promo">{{subItem.intro}}</p>
-                </div>
-                <div class="item-four-detail-img">
-                  <router-link to="/goodsList">
-                    <img :src="subItem.img" alt="">
-                  </router-link>
-                </div>
-              </div>
-            </div>
-          </div>
-          <div class="item-content-bottom">
-            <div class="item-content-bottom-img" v-for="(subImg, index) in item.itemContent" :key="index">
-              <router-link to="/goodsList">
-                <img :src="subImg">
-              </router-link>
-            </div>
+        <div class="item-class-content" v-for="(item, index) in Recommend.data" :key="index" v-show="index < 2">
+          <div class="item-big-img">
+            <router-link :to="{path:'/goodsDetail',query:{id:item.id}}">
+              <img :src="item.goods_image" alt="">
+            </router-link>
           </div>
         </div>
       </div>
@@ -125,7 +83,7 @@
 </template>
 
 <script>
-import Sreach from '@/components/Sreach';
+import Search from '@/components/Search';
 import HomeNav from '@/components/nav/HomeNav';
 import Footer from '@/components/footer/Footer';
 import store from '@/vuex/store';
@@ -135,9 +93,8 @@ export default {
   created () {
     this.loadSeckillsInfo();
     this.loadCarouselItems();
-    this.loadComputer();
-    this.loadEat();
-    this.loadShoppingCart();
+    this.loadNew();
+    this.loadRecommend();
   },
   mounted () {
     const father = this;
@@ -151,15 +108,15 @@ export default {
     };
   },
   methods: {
-    ...mapActions(['loadSeckillsInfo', 'loadCarouselItems', 'loadComputer', 'loadEat', 'loadShoppingCart']),
+    ...mapActions(['loadSeckillsInfo', 'loadCarouselItems', 'loadNew', 'loadRecommend']),
     ...mapMutations(['REDUCE_SECKILLS_TIME'])
   },
   computed: {
-    ...mapState([ 'seckills', 'computer', 'eat' ]),
+    ...mapState([ 'seckills', 'New', 'Recommend' ]),
     ...mapGetters([ 'seckillsHours', 'seckillsMinutes', 'seckillsSeconds' ])
   },
   components: {
-    Sreach,
+    Search,
     HomeNav,
     Footer
   },
@@ -293,7 +250,7 @@ export default {
   padding-left: 15px;
   padding-right: 15px;
   font-size: 12px;
-  color: #009688;
+  color: #ff6666;
 }
 .seckill-item-info i:first-child {
   font-size: 14px;
@@ -366,13 +323,11 @@ export default {
   width: 100%;
   height: 260px;
 }
-.item-big-img {
-  width: 180px;
-  height: 260px;
-  overflow: hidden;
-  float: left;
+.item-big-img{
+  padding: 0px 0px;
 }
 .item-big-img img {
+  height: 400px;
   margin-left: 0px;
   transition: margin-left 0.3s;
 }

@@ -24,7 +24,7 @@
         <li v-show="!!userInfo.username">
           <Dropdown>
             <p class="username-p">
-              <Avatar class="person-icon" icon="person" size="small" /> <span class="username">{{userInfo.username}} </span>
+              <span class="username">{{userInfo.username}} &nbsp;</span><img style="width: 20px;height: 20px;border-radius: 50%;margin-top: 5px;" :src="userInfo.avatar"/>
             </p>
             <DropdownMenu slot="list">
                 <div class="my-page">
@@ -46,33 +46,29 @@
               <Icon type="ios-cart-outline"></Icon> 购物车
             </a>
             <DropdownMenu slot="list">
-              <div class="shopping-cart-null" v-show="shoppingCart.length <= 0">
+              <div class="shopping-cart-null" v-show="!shoppingCart">
                 <Icon type="ios-cart-outline" class="cart-null-icon"></Icon>
                 <span>你的购物车没有空空哦</span>
                 <span>赶快去添加商品吧~</span>
               </div>
-              <div class="shopping-cart-list" v-show="shoppingCart.length > 0">
+              <div class="shopping-cart-list" v-show="shoppingCart">
                 <div class="shopping-cart-box" v-for="(item,index) in shoppingCart" :key="index">
                   <div class="shopping-cart-img">
-                    <img :src="item.img">
+                    <img :src="item.goods_image">
                   </div>
                   <div class="shopping-cart-info">
                     <div class="shopping-cart-title">
-                      <p>{{item.title.substring(0, 22)}}...</p>
+                      <p>{{item.goods_name.substring(0, 22)}}...</p>
                     </div>
                     <div class="shopping-cart-detail">
                       <p>
-                        套餐:
-                        <span class="shopping-cart-text">
-                          {{item.package}}
-                        </span>
                         数量:
                         <span class="shopping-cart-text">
-                          {{item.count}}
+                          {{item.goods_num}}
                         </span>
                         价钱:
                         <span class="shopping-cart-text">
-                          {{item.price}}
+                          {{item.goods_price}}
                         </span>
                       </p>
                     </div>
@@ -100,7 +96,7 @@ import store from '@/vuex/store';
 import { mapState, mapActions } from 'vuex';
 export default {
   name: 'M-Header',
-  created () {
+  mounted () {
     this.isLogin();
     this.loadShoppingCartSync();
   },
@@ -119,11 +115,14 @@ export default {
     ...mapState(['userInfo', 'shoppingCart'])
   },
   methods: {
-    ...mapActions(['signOut', 'isLogin', 'loadShoppingCartSync']),
+    ...mapActions(['signOut', 'isLogin', 'loadShoppingCartSync', 'addCheckShoppingCart']),
     changeCity (city) {
       this.city = city;
     },
     goToPay () {
+      let data = {};
+      data.goodsList = this.shoppingCart;
+      this.addCheckShoppingCart(data);
       this.$router.push('/order');
     },
     myInfo () {

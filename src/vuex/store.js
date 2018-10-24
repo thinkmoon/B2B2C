@@ -8,9 +8,9 @@ Vue.use(Vuex);
 
 export default new Vuex.Store({
   state: {
-    phone: 0,
     isLoading: false, // 是否展示loading动画
     orderBy: 'sale', // 根据什么字段排序
+    orderInfo: [],
     goodsInfo: { // 商品详情
       goodsImg: [],
       title: '',
@@ -40,13 +40,16 @@ export default new Vuex.Store({
       },
       goodsList: []
     },
-    computer: {}, // 电脑专栏
-    eat: {}, // 爱吃专栏
+    New: {
+      data: []
+    }, // 电脑专栏
+    Recommend: {
+      data: []
+    },
     asItems: [], // 广告
     goodsList: [], // 商品列表
     shoppingCart: [], // 购物车
-    newShoppingCart: [], // 刚加入的购物车，作为展示
-    recommend: [] // 推荐购买
+    ShoppingCartCheck: []
   },
   getters,
   actions,

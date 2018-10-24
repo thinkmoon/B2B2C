@@ -140,7 +140,7 @@ export default {
         goods_id: this.goodsInfo.id,
         goods_num: this.count
       };
-      addShopping(requestData);
+      addShopping(requestData, this.userInfo.token);
       this.$router.push({ path: '/home/myShoppingCart' });
     }
   },

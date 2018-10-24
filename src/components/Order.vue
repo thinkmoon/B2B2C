@@ -1,6 +1,6 @@
 <template>
   <div>
-    <Sreach></Sreach>
+    <Search></Search>
     <GoodsListNav></GoodsListNav>
     <div class="goods-list-container">
       <Alert show-icon class="tips-box">
@@ -8,7 +8,7 @@
         <Icon type="ios-lightbulb-outline" slot="icon"></Icon>
         <template slot="desc">请点击商品前的选择框，选择购物车中的商品，点击付款即可。</template>
       </Alert>
-      <Table border ref="selection" :columns="columns" :data="shoppingCart" size="large" @on-selection-change="select" no-data-text="您的购物车没有商品，请先添加商品到购物车再点击购买"></Table>
+      <Table border ref="selection" :columns="columns" :data="orderInfo" size="large" @on-selection-change="select" no-data-text="您的购物车没有商品，请先添加商品到购物车再点击购买"></Table>
       <div class="address-container">
         <h3>收货人信息</h3>
         <div class="address-box">
@@ -46,7 +46,7 @@
         <div class="pay-box">
           <p><span>提交订单应付总额：</span> <span class="money"><Icon type="social-yen"></Icon> {{totalPrice.toFixed(2)}}</span></p>
           <div class="pay-btn">
-            <router-link to="/pay"><Button type="error" size="large">支付订单</Button></router-link>
+            <Button type="error" @click="payAction" size="large">支付订单</Button>
           </div>
         </div>
       </div>
@@ -56,12 +56,12 @@
 </template>
 
 <script>
-import Sreach from '@/components/Sreach';
+import Search from '@/components/Search';
 import GoodsListNav from '@/components/nav/GoodsListNav';
 import Footer from '@/components/footer/Footer';
 import store from '@/vuex/store';
 import { mapState, mapActions } from 'vuex';
-import { getUserConsignee, getShopping } from '../api/index';
+import { showOrder, pay } from '../api/index';
 export default {
   name: 'Order',
   beforeRouteEnter (to, from, next) {
@@ -69,32 +69,30 @@ export default {
     next();
   },
   created () {
-    getUserConsignee({user_id: this.userInfo.id}, this.userInfo.token).then(
-      res => {
-        if (res.code === -1) {
-          this.$Message.error('暂无信息，请先添加收获地址');
-        } else {
-          this.loadAddress(res.data);
-          this.addressData = res.data;
-        }
-      }
-    );
-    getShopping({user_id: this.userInfo.user_id}, {token: this.userInfo.token}).then(
-      res => {
-        this.loadShoppingCart(res.data);
-      }
-    );
+    this.loadCheckShoppingCart();
+  },
+  mounted () {
+    let orderId = this.$route.query.orderId;
+    if (orderId) {
+
+    } else {
+      setTimeout(() => {
+        showOrder({user_id: this.userInfo.user_id, goods: JSON.stringify(this.ShoppingCartCheck.goodsList)}, this.userInfo.token).then(
+          res => {
+            if (res.code === 1) {
+              this.addressData = res.data.user_consignee;
+              this.orderInfo = res.data.order_info;
+            }
+          }
+        );
+      }, 500);
+    }
   },
   data () {
     return {
       addressData: [],
-      goodsCheckList: [],
+      orderInfo: [],
       columns: [
-        {
-          type: 'selection',
-          width: 58,
-          align: 'center'
-        },
         {
           title: '图片',
           key: 'img',
@@ -125,12 +123,13 @@ export default {
         },
         {
           title: '价格',
-          width: 68,
-          key: 'goods_amount',
+          width: 108,
+          key: 'goods_price',
           align: 'center'
         }
       ],
       checkAddress: {
+        id: '',
         name: '未选择',
         address: '请选择地址'
       },
@@ -138,17 +137,17 @@ export default {
     };
   },
   computed: {
-    ...mapState(['address', 'shoppingCart', 'userInfo']),
+    ...mapState(['userInfo', 'ShoppingCartCheck']),
     totalPrice () {
       let price = 0;
-      this.goodsCheckList.forEach(item => {
-        price += item.goods_amount;
+      this.orderInfo.forEach(item => {
+        price += item.goods_price * item.goods_num;
       });
       return price;
     }
   },
   methods: {
-    ...mapActions(['loadAddress', 'loadShoppingCart']),
+    ...mapActions(['loadAddress', 'loadCheckShoppingCart']),
     select (selection, row) {
       console.log(selection);
       this.goodsCheckList = selection;
@@ -157,19 +156,34 @@ export default {
       const father = this;
       this.addressData.forEach(item => {
         if (item.id === data) {
+          father.checkAddress.id = item.id;
           father.checkAddress.name = item.receiver;
           father.checkAddress.address = `${item.receiver} ${item.province} ${item.city} ${item.address} ${item.mobile} ${item.zip}`;
         }
       });
+    },
+    payAction () {
+      pay(
+        {
+          user_id: this.userInfo.user_id,
+          order_no: this.orderInfo[0].order_no,
+          consignee_id: this.checkAddress.id,
+          remark: this.remarks,
+          shipping_method: 0,
+          payment_method: 0
+        },
+        this.userInfo.token
+      ).then(
+        res => {
+          if (res.code === 1) {
+            this.$Message.success('支付成功');
+          }
+        }
+      );
     }
   },
-  mounted () {
-    setTimeout(() => {
-      this.$refs.selection.selectAll(true);
-    }, 500);
-  },
   components: {
-    Sreach,
+    Search,
     GoodsListNav,
     Footer
   },

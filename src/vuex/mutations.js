@@ -32,19 +32,14 @@ export const SET_SECKILLS_INFO = (state, seckills) => {
 };
 
 // 设置轮播(营销)图
-export const SET_CAROUSELITEMS_INFO = (state, { carouselItems, activity }) => {
-  state.marketing.CarouselItems = carouselItems;
-  state.marketing.activity = activity;
+export const SET_CAROUSELITEMS_INFO = (state, data) => {
+  state.marketing.CarouselItems = data;
+  state.marketing.activity = data;
 };
 
-// 设置电脑专栏数据
-export const SET_COMPUTER_INFO = (state, computer) => {
-  state.computer = computer;
-};
-
-// 设置爱吃专栏数据
-export const SET_EAT_INFO = (state, eat) => {
-  state.eat = eat;
+// 设置新品
+export const SET_NEW_INFO = (state, data) => {
+  state.New = data;
 };
 
 // 减少秒杀时间
@@ -97,7 +92,7 @@ export const SET_SHOPPING_CART = (state, data) => {
 
 // 设置推荐信息
 export const SET_RECOMMEND_INFO = (state, data) => {
-  state.recommend = data;
+  state.Recommend = data;
 };
 
 // 设置收获地址
@@ -108,4 +103,11 @@ export const SET_USER_ADDRESS = (state, data) => {
 // 设置收获地址
 export const GET_USER_ADDRESS = (state, data) => {
   return state.address;
+};
+// 设置待支付订单商品
+export const SET_SHOPPING_CHECK = (state, data) => {
+  state.ShoppingCartCheck = data;
+};
+export const SET_ORDERINFO = (state, data) => {
+  state.orderInfo = data;
 };

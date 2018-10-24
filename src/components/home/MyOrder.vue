@@ -1,6 +1,6 @@
 <template>
   <div>
-    <Table border :columns="columns" :data="order" size="large" no-data-text="你还有订单，快点去购物吧"></Table>
+    <Table border :columns="columns" :data="orderInfo.data" size="large" no-data-text="你还有订单，快点去购物吧"></Table>
     <div class="page-size">
       <Page :total="100" show-sizer></Page>
     </div>
@@ -8,70 +8,110 @@
 </template>
 
 <script>
+import { mapState, mapMutations } from 'vuex';
+import { getOrderLists } from '../../api/index';
 export default {
   name: 'MyOrder',
+  mounted () {
+    getOrderLists({user_id: this.userInfo.user_id}, this.userInfo.token).then(
+      res => {
+        if (res.code === 1) {
+          this.SET_ORDERINFO(res.data);
+        }
+      }
+    );
+  },
+  computed: {
+    ...mapState(['userInfo', 'orderInfo'])
+  },
+  methods: {
+    ...mapMutations(['SET_ORDERINFO'])
+  },
   data () {
     return {
-      order: [{
-        order_id: 1529931938150,
-        goods_id: 1529931938150,
-        count: 1,
-        img: 'static/img/goodsDetail/pack/1.jpg',
-        package: '4.7英寸-深邃蓝',
-        price: 28,
-        title: '苹果8/7手机壳iPhone7 Plus保护壳全包防摔磨砂硬外壳',
-        createAt: '2018-06-06 20:06:08'
-      }],
       columns: [
         {
           title: '订单号',
-          key: 'order_id',
+          key: 'order_no',
           width: 180,
           align: 'center'
         },
         {
-          title: '图片',
-          key: 'img',
-          width: 86,
-          render: (h, params) => {
-            return h('div', [
-              h('img', {
-                attrs: {
-                  src: params.row.img
-                }
-              })
-            ]);
-          },
-          align: 'center'
-        },
-        {
-          title: '标题',
-          key: 'title',
-          align: 'center'
-        },
-        {
-          title: '套餐',
-          width: 198,
-          key: 'package',
-          align: 'center'
-        },
-        {
-          title: '数量',
-          key: 'count',
-          width: 68,
+          title: '备注',
+          key: 'remark',
           align: 'center'
         },
         {
           title: '价格',
-          width: 68,
-          key: 'price',
+          width: 98,
+          key: 'goods_amount',
           align: 'center'
         },
         {
-          title: '购买时间',
-          width: 120,
-          key: 'createAt',
+          title: '快递方式',
+          width: 108,
+          key: 'remark',
+          render: (h, params) => {
+            return h('span', '默认');
+          },
           align: 'center'
+        },
+        {
+          title: '创建时间',
+          width: 120,
+          key: 'create_time',
+          render: (h, params) => {
+            return h('i-time', {props: { time: params.row.create_time }}, params.row.create_time);
+          },
+          align: 'center'
+        },
+        {
+          title: '状态',
+          width: 120,
+          key: 'order_status',
+          render: (h, params) => {
+            let status = '默认';
+            if (params.row.order_status === 0) {
+              status = '未支付';
+            }
+            return h('span', status);
+          },
+          align: 'center'
+        },
+        {
+          title: '操作',
+          key: 'action',
+          width: 150,
+          align: 'center',
+          render: (h, params) => {
+            return h('div', [
+              h('Button', {
+                props: {
+                  type: 'primary',
+                  size: 'small'
+                },
+                style: {
+                  marginRight: '5px'
+                },
+                on: {
+                  click: () => {
+                    this.show(params.index);
+                  }
+                }
+              }, '支付'),
+              h('Button', {
+                props: {
+                  type: 'error',
+                  size: 'small'
+                },
+                on: {
+                  click: () => {
+                    this.remove(params.index);
+                  }
+                }
+              }, '删除')
+            ]);
+          }
         }
       ]
     };

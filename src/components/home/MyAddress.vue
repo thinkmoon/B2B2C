@@ -26,16 +26,16 @@
                 <i-input v-model="formData.receiver" size="large"></i-input>
               </FormItem>
               <FormItem label="收件地区" prop="address">
-                <!-- <Distpicker :province="formData.province" :city="formData.city" :area="formData.area" @province="getProvince" @city="getCity" @area="getArea"></Distpicker> -->
+                <Distpicker :province="formData.province" :city="formData.city" :area="formData.area" @province="getProvince" @city="getCity" @area="getArea"></Distpicker>
               </FormItem>
               <FormItem label="收件地址" prop="address">
                 <i-input v-model="formData.address" size="large"></i-input>
               </FormItem>
               <FormItem label="手机号码" prop="phone">
-                <i-input v-model="formData.phone" size="large"></i-input>
+                <i-input v-model="formData.mobile" size="large"></i-input>
               </FormItem>
               <FormItem label="邮政编码" prop="postalcode">
-                <i-input v-model="formData.postalcode" size="large"></i-input>
+                <i-input v-model="formData.zip" size="large"></i-input>
               </FormItem>
             </Form>
         </div>
@@ -50,7 +50,7 @@
 import store from '@/vuex/store';
 import { mapState, mapActions, mapMutations, mapGetters } from 'vuex';
 import Distpicker from 'v-distpicker';
-import { getUserConsignee } from '../../api/index';
+import { getUserConsignee, delUserConsignee, editUserConsignee } from '../../api/index';
 export default {
   name: 'MyAddress',
   data () {
@@ -58,10 +58,10 @@ export default {
       addressData: [],
       modal: false,
       formData: {
-        name: '',
-        address: '',
-        phone: '',
-        postalcode: '',
+        receiver: '李大嘴',
+        address: '东莞理工学院',
+        mobile: '17666200123',
+        zip: '521800',
         province: '广东省',
         city: '广州市',
         area: '天河区'
@@ -84,16 +84,7 @@ export default {
     };
   },
   mounted () {
-    getUserConsignee({user_id: this.userInfo.id}, this.userInfo.token).then(
-      res => {
-        if (res.code === -1) {
-          this.$Message.error('暂无信息，请先添加收获地址');
-        } else {
-          this.addressData = res.data;
-          console.log(this.addressData);
-        }
-      }
-    );
+    this.updateAddress();
   },
   computed: {
     ...mapState(['address', 'userInfo']),
@@ -102,26 +93,45 @@ export default {
   methods: {
     ...mapActions(['loadAddress']),
     ...mapMutations(['SET_USER_ADDRESS', 'GET_USER_ADDRESS']),
+    updateAddress () {
+      getUserConsignee({user_id: this.userInfo.id}, this.userInfo.token).then(
+        res => {
+          if (res.code === -1) {
+            this.$Message.error('暂无信息，请先添加收获地址');
+          } else {
+            this.addressData = res.data;
+            console.log(this.addressData);
+          }
+        }
+      );
+    },
     edit (index) {
       this.modal = true;
-      this.formData.province = this.address[index].province;
-      this.formData.city = this.address[index].city;
-      this.formData.area = this.address[index].area;
-      this.formData.address = this.address[index].address;
-      this.formData.name = this.address[index].name;
-      this.formData.phone = this.address[index].phone;
-      this.formData.postalcode = this.address[index].postalcode;
+      this.formData = this.addressData[index];
     },
     editAction () {
-      this.modal = false;
-      this.$Message.success('修改成功');
+      editUserConsignee(this.formData, this.userInfo.token).then(
+        res => {
+          if (res.code === 1) {
+            this.modal = false;
+            this.$Message.success('修改成功');
+          }
+        }
+      );
     },
     del (index) {
       this.$Modal.confirm({
         title: '信息提醒',
         content: '你确定删除这个收货地址',
         onOk: () => {
-          this.$Message.success('删除成功');
+          delUserConsignee({id: this.addressData[index].id, user_id: this.userInfo.user_id}, this.userInfo.token).then(
+            res => {
+              if (res.code === 1) {
+                this.$Message.success(this.addressData[index].id + '删除成功');
+                this.updateAddress();
+              }
+            }
+          );
         },
         onCancel: () => {
           this.$Message.info('取消删除');

@@ -22,17 +22,10 @@
           <Carousel autoplay loop>
               <CarouselItem  v-for="(item, index) in marketing.CarouselItems" :key="index">
                 <router-link to="/goodsList">
-                  <img :src="item">
+                  <img style="width: 800px; height: 485px;" :src="item">
                 </router-link>
               </CarouselItem>
           </Carousel>
-        </div>
-        <div class="nav-show">
-          <div class="nav-show-img" v-for="(item, index) in marketing.activity" :key="index">
-            <router-link to="/goodsList">
-              <img :src="item">
-            </router-link>
-          </div>
         </div>
       </div>
     </div>
@@ -66,11 +59,11 @@ export default {
       panel: false,
       nav: [
         '秒杀',
-        '优惠券',
-        '闪购',
-        '拍卖',
-        '服装城',
-        '超市',
+        '特惠',
+        '推荐',
+        '拼团',
+        '热买',
+        '一元购',
         '生鲜',
         '全球购',
         '金融'
