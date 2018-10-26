@@ -1,12 +1,11 @@
 <template>
-  <div>
     <div class="item-detail-show">
       <div class="item-detail-left">
         <div class="item-detail-big-img">
-          <img :src="goodsInfo.goods_image == '' ? goodsInfo.goods_image : 'static/img/goodsList/item-show-6.jpg'" alt="">
+          <img :src="goodsInfo.goods_image !== '' ? goodsInfo.goods_image : 'static/img/goodsList/item-show-6.jpg'" alt="">
         </div>
         <div class="item-detail-img-row">
-          <div class="item-detail-img-small" v-for="(item, index) in goodsInfo.goodsImg" :key="index" @mouseover="showBigImg(index)">
+          <div class="item-detail-img-small" v-for="(item, index) in (goodsInfo.goods_images.length === 0 ? goodsImg : goodsInfo.goods_images)" :key="index" @mouseover="showBigImg(index)">
             <img :src="item" alt="">
           </div>
         </div>
@@ -25,22 +24,22 @@
           <div class="item-price-left">
             <div class="item-price-row">
               <p>
-                <span class="item-price-title">原 价</span>
-                <span class="item-price">￥{{goodsInfo.original_price}}</span>
+                <span class="item-price-title">促&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;销</span>
+                <span class="item-price">￥{{goodsInfo.now_price}}</span>
               </p>
             </div>
             <div class="item-price-row">
               <p>
-                <span class="item-price-title">促&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;销</span>
-                <span class="item-price-full-cut" >￥{{goodsInfo.now_price}}</span>
+                <span class="item-price-title">原 价</span>
+                <span class="item-price-full-cut" >￥{{goodsInfo.original_price}}</span>
               </p>
             </div>
           </div>
           <div class="item-price-right">
             <div class="item-remarks-sum">
-              <p>累计评价</p>
+              <p>剩余库存</p>
               <p>
-                <span class="item-remarks-num">{{goodsInfo.goods_no}} 条</span>
+                <span class="item-remarks-num">{{goodsInfo.goods_stock}}</span>
               </p>
             </div>
           </div>
@@ -51,13 +50,13 @@
             <p>商品描述</p>
           </div>
           <div class="item-select-column">
-            {{goodsInfo.goods_content}}
+            {{goodsInfo.goods_intro}}
           </div>
         </div>
         <!-- 白条分期 -->
         <div class="item-select">
           <div class="item-select-title">
-            <p>白条分期</p>
+            <p>白条分期(该商品不支持分期)</p>
           </div>
           <div class="item-select-row">
             <div class="item-select-class" v-for="(item,index) in hirePurchase" :key="index">
@@ -81,7 +80,7 @@
 
 <script>
 import store from '@/vuex/store';
-import { mapState, mapActions } from 'vuex';
+import { mapState } from 'vuex';
 import { addShopping } from '../../api/index';
 export default {
   name: 'ShowGoods',
@@ -90,7 +89,13 @@ export default {
       price: 0,
       count: 1,
       selectBoxIndex: 0,
-      imgIndex: 0
+      imgIndex: 0,
+      goodsImg: [
+        'static/img/goodsDetail/intro/1.jpg',
+        'static/img/goodsDetail/intro/2.jpg',
+        'static/img/goodsDetail/intro/3.jpg',
+        'static/img/goodsDetail/intro/4.jpg'
+      ]
     };
   },
   computed: {
@@ -125,7 +130,6 @@ export default {
     }
   },
   methods: {
-    ...mapActions(['addShoppingCart']),
     select (index1, index2) {
       this.selectBoxIndex = index1 * 3 + index2;
       this.price = this.goodsInfo.setMeal[index1][index2].price;

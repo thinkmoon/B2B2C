@@ -27,12 +27,12 @@
         </div>
         <!-- 内容 -->
         <div class="seckill-content">
-          <div class="seckill-item" v-for="(item, index) in seckills.goodsList.data" :key="index">
+          <div class="seckill-item" v-for="(item, index) in seckills.goodsList.data" v-show="index < 5" :key="index">
             <div class="seckill-item-img">
               <router-link :to="{path:'/goodsDetail',query:{id:item.id}}"><img :src="item.goods_image"></router-link>
             </div>
             <div class="seckill-item-info">
-              <p>{{item.goods_name}}</p>
+              <p>{{item.goods_name.substring(0,14)}}</p>
               <p>
                 <span class="seckill-price text-danger"><Icon type="social-yen"></Icon>{{item.now_price}}</span>
                 <span class="seckill-old-price"><s>{{item.original_price}}</s></span>
@@ -47,7 +47,7 @@
           <span class="item-class-title">新品推荐</span>
           <ul>
             <li v-for="(item, index) in New.data" :key="index">
-              <router-link :to="{path:'/goodsDetail',query:{id:item.id}}">{{item.goods_name}}</router-link>
+              <router-link :to="{path:'/goodsDetail',query:{id:item.id}}">{{item.goods_name.substring(0, 4)}}</router-link>
             </li>
           </ul>
         </div>
@@ -65,7 +65,7 @@
           <span class="item-class-title">为您推荐</span>
           <ul>
             <li v-for="(item, index) in Recommend.data" :key="index">
-              <router-link :to="{path:'/goodsDetail',query:{id:item.id}}">{{item.goods_name}}</router-link>
+              <router-link :to="{path:'/goodsDetail',query:{id:item.id}}">{{item.goods_name.substring(0,4)}}</router-link>
             </li>
           </ul>
         </div>

@@ -11,10 +11,12 @@ const GoodsDetail = resolve => require(['@/components/GoodsDetail'], resolve);
 const ShoppingCart = resolve => require(['@/components/ShoppingCart'], resolve);
 const Order = resolve => require(['@/components/Order'], resolve);
 const Pay = resolve => require(['@/components/Pay'], resolve);
+const Reg = resolve => require(['@/components/Reg'], resolve);
 const PayDone = resolve => require(['@/components/PayDone'], resolve);
 const Freeback = resolve => require(['@/components/Freeback'], resolve);
 const Home = resolve => require(['@/components/Home'], resolve);
 const MyAddress = resolve => require(['@/components/home/MyAddress'], resolve);
+const MyExpress = resolve => require(['@/components/home/MyExpress'], resolve);
 const AddAddress = resolve => require(['@/components/home/AddAddress'], resolve);
 const MyOrder = resolve => require(['@/components/home/MyOrder'], resolve);
 const MyShoppingCart = resolve => require(['@/components/home/MyShoppingCart'], resolve);
@@ -87,6 +89,11 @@ export default new Router({
       component: Pay
     },
     {
+      path: '/Reg', // 店铺注册
+      name: 'Reg',
+      component: Reg
+    },
+    {
       path: '/payDone', // 支付成功页面
       name: 'PayDone',
       component: PayDone
@@ -110,6 +117,11 @@ export default new Router({
           path: 'myAddress',
           name: 'MyAddress',
           component: MyAddress
+        },
+        {
+          path: 'myExpress',
+          name: 'myExpress',
+          component: MyExpress
         },
         {
           path: 'addAddress',

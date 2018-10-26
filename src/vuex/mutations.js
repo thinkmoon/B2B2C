@@ -111,3 +111,7 @@ export const SET_SHOPPING_CHECK = (state, data) => {
 export const SET_ORDERINFO = (state, data) => {
   state.orderInfo = data;
 };
+// 设置商户ID
+export const SET_ADMINID = (state, data) => {
+  state.adminId = data;
+};

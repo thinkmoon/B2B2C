@@ -8,22 +8,11 @@ Vue.use(Vuex);
 
 export default new Vuex.Store({
   state: {
+    adminId: 1,
     isLoading: false, // 是否展示loading动画
     orderBy: 'sale', // 根据什么字段排序
     orderInfo: [],
-    goodsInfo: { // 商品详情
-      goodsImg: [],
-      title: '',
-      tags: [],
-      discount: [],
-      promotion: [],
-      remarksNum: 0,
-      setMeal: [],
-      hot: [],
-      goodsDetail: [],
-      param: [],
-      remarks: []
-    },
+    goodsInfo: { },
     userInfo: { // 用户信息
       username: ''
     },
@@ -42,7 +31,7 @@ export default new Vuex.Store({
     },
     New: {
       data: []
-    }, // 电脑专栏
+    }, // 新品专栏
     Recommend: {
       data: []
     },

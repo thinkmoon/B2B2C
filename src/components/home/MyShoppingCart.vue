@@ -94,17 +94,13 @@ export default {
     };
   },
   mounted () {
-    getShopping({user_id: this.userInfo.user_id}, this.userInfo.token).then(
-      res => {
-        this.addShoppingCart(res.data);
-      }
-    );
+    this.loadShoppingCart({user_id: this.userInfo.user_id}, this.userInfo.token);
   },
   computed: {
     ...mapState(['shoppingCart', 'userInfo', 'shoppingCartCheck'])
   },
   methods: {
-    ...mapActions(['addShoppingCart', 'addCheckShoppingCart']),
+    ...mapActions(['loadShoppingCart', 'addCheckShoppingCart']),
     select (selection, row) {
       let data = {};
       data.goodsList = selection;

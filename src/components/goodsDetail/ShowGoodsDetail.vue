@@ -6,15 +6,17 @@
           <p>店铺热销</p>
         </div>
         <div class="item-intro-recommend-column">
-          <div class="item-recommend-column" v-for="(item, index) in goodsInfo.hot" :key="index">
+          <div class="item-recommend-column" v-for="(item, index) in hot" :key="index">
+            <router-link :to="{path:'/goodsDetail',query:{id:item.id}}">
             <div class="item-recommend-img">
-              <img :src="item.img" alt="">
+              <img :src="item.goods_image" alt="">
             </div>
             <div class="item-recommend-intro">
               <span>
-                <span class="item-recommend-top-num">{{index + 1}}</span> 热销{{item.sale}}件</span>
-              <span class="item-recommend-price">￥{{item.price.toFixed(2)}}</span>
+                <span class="item-recommend-top-num">{{index + 1}}</span> 仅剩{{item.goods_stock}}件</span>
+              <span class="item-recommend-price">￥{{item.now_price}}</span>
             </div>
+            </router-link>
           </div>
         </div>
       </div>
@@ -26,19 +28,14 @@
                 <span>商品介绍</span>
               </div>
               <div class="item-intro-img" ref="itemIntroGoods">
-                <img :src="item" alt="" v-for="(item,index) in goodsInfo.goodsDetail" :key="index">
+                <img :src="item" alt="" v-for="(item,index) in (goodsInfo.goods_images.length === 0 ? goodsImg : goodsInfo.goods_images)" :key="index">
               </div>
             </TabPane>
             <TabPane label="规格参数">
               <div class="remarks-title">
                 <span>规格参数</span>
               </div>
-              <div class="item-param-container">
-                <span class="item-param-box" v-for="(item,index) in goodsInfo.param" :key="index">
-                  <span class="item-param-title">{{item.title}}: </span>
-                  <span class="item-param-content">{{item.content}}</span>
-                </span>
-              </div>
+              <span v-html="goodsInfo.goods_content"></span>
             </TabPane>
             <TabPane label="售后保障">
               <ShowProductWarranty></ShowProductWarranty>
@@ -50,22 +47,22 @@
                 </div>
                 <div class="remarks-analyse-box">
                   <div class="remarks-analyse-goods">
-                    <i-circle :percent="goodsInfo.remarks.goodAnalyse" stroke-color="#e4393c">
-                      <span class="remarks-analyse-num">{{goodsInfo.remarks.goodAnalyse}}%</span>
+                    <i-circle :percent="89" stroke-color="#e4393c">
+                      <span class="remarks-analyse-num">89%</span>
                       <p class="remarks-analyse-title">好评率</p>
                     </i-circle>
                   </div>
                   <div class="remarks-analyse-tags">
-                    <Tag checkable :color="tagsColor[index % 4]" v-for="(item,index) in goodsInfo.remarks.remarksTags" :key="index">{{item}}</Tag>
+                    <Tag checkable :color="tagsColor[index % 4]" v-for="(item,index) in Evaluate.data" :key="index">{{item.content}}</Tag>
                   </div>
                 </div>
                 <div class="remarks-bar">
-                  <span>追评({{goodsInfo.remarks.remarksNumDetail[0]}})</span>
-                  <span>好评({{goodsInfo.remarks.remarksNumDetail[1]}})</span>
-                  <span>中评({{goodsInfo.remarks.remarksNumDetail[2]}})</span>
-                  <span>差评({{goodsInfo.remarks.remarksNumDetail[3]}})</span>
+                  <span>追评6</span>
+                  <span>好评6</span>
+                  <span>中评6</span>
+                  <span>差评6</span>
                 </div>
-                <div class="remarks-box" v-for="(item,index) in goodsInfo.remarks.detail" :key="index">
+                <div class="remarks-box" v-for="(item,index) in Evaluate.data" :key="index">
                   <div class="remarks-user">
                     <Avatar icon="person" />
                     <span class="remarks-user-name">{{item.username}}</span>
@@ -82,7 +79,7 @@
                   </div>
                 </div>
                 <div class="remarks-page">
-                  <Page :total="40" size="small" show-elevator show-sizer></Page>
+                  <Page :total="Evaluate.total" size="small" :current="Evaluate.current_page" show-elevator show-sizer></Page>
                 </div>
               </div>
             </TabPane>
@@ -97,23 +94,46 @@
 import ShowProductWarranty from '@/components/goodsDetail/ShowProductWarranty';
 import store from '@/vuex/store';
 import { mapState } from 'vuex';
+import { getFlagGoods, getGoodsEvaluate } from '../../api/index';
 export default {
   name: 'ShowGoodsDetail',
   data () {
     return {
+      guige: [
+        {
+          title: '配置',
+          content: '32G'
+        }
+      ],
+      goodsImg: [
+        'static/img/goodsDetail/intro/1.jpg',
+        'static/img/goodsDetail/intro/2.jpg',
+        'static/img/goodsDetail/intro/3.jpg',
+        'static/img/goodsDetail/intro/4.jpg'
+      ],
+      Evaluate: {
+        current_page: 1,
+        data: [],
+        last_page: 1,
+        per_page: 10,
+        total: 1
+      },
+      hot: [],
       tagsColor: [ 'blue', 'green', 'red', 'yellow' ]
     };
   },
-  computed: {
-    ...mapState(['goodsInfo'])
-  },
-  methods: {
-    changeHeight () {
-      let heightCss = window.getComputedStyle(this.$refs.itemIntroGoods).height;
-      console.log(heightCss);
-      heightCss = parseInt(heightCss.substr(0, heightCss.length - 2)) + 89;
-      this.$refs.itemIntroDetail.style.height = heightCss + 'px';
-    }
+  created () {
+    getFlagGoods({flag: 'hot'}).then(
+      res => {
+        this.hot = res.data.data;
+        console.log(this.hot);
+      }
+    );
+    getGoodsEvaluate({goods_id: this.$route.query.id}).then(
+      res => {
+        this.Evaluate = res.data;
+      }
+    );
   },
   updated () {
     this.$nextTick(() => {
@@ -128,6 +148,17 @@ export default {
       setTimeout(this.changeHeight, 30000);
       setTimeout(this.changeHeight, 50000);
     });
+  },
+  computed: {
+    ...mapState(['goodsInfo'])
+  },
+  methods: {
+    changeHeight () {
+      let heightCss = window.getComputedStyle(this.$refs.itemIntroGoods).height;
+      console.log(heightCss);
+      heightCss = parseInt(heightCss.substr(0, heightCss.length - 2)) + 89;
+      this.$refs.itemIntroDetail.style.height = heightCss + 'px';
+    }
   },
   components: {
     ShowProductWarranty

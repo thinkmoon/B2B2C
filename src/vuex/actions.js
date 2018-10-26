@@ -1,4 +1,4 @@
-import { getGoodsInfo, getFlagGoods, getSowing } from '../api/index';
+import { getFlagGoods, getSowing, getShopping } from '../api/index';
 // 获取秒杀数据
 export const loadSeckillsInfo = ({ commit }) => {
   return new Promise((resolve, reject) => {
@@ -65,36 +65,21 @@ export const loadRecommend = ({ commit }) => {
   });
 };
 
-// 请求获得商品详细信息
-export const loadGoodsInfo = ({ commit }, data) => {
-  commit('SET_LOAD_STATUS', true);
-  getGoodsInfo(data).then(
-    res => {
-      const data = res.data;
-      console.log(data);
-      commit('SET_GOODS_INFO', data);
-      commit('SET_LOAD_STATUS', false);
-    }
-  );
-};
-
 export const loadAddress = ({ commit }, data) => {
   commit('SET_USER_ADDRESS', data);
 };
 // 添加购物车
-export const addShoppingCart = ({ commit }, data) => {
+export const loadShoppingCart = ({ commit }, data, token) => {
   return new Promise((resolve, reject) => {
-    localStorage.setItem('shoppingCart', JSON.stringify(data));
-    console.log('addShoppingCart', JSON.stringify(data));
-    commit('SET_SHOPPING_CART', data);
+    getShopping(data, token).then(
+      res => {
+        if (res.code === 1) {
+          commit('SET_SHOPPING_CART', res.data);
+          resolve(true);
+        }
+      }
+    );
   });
-};
-export const loadShoppingCartSync = ({ commit }) => {
-  if (localStorage.getItem('shoppingCart')) {
-    commit('SET_SHOPPING_CART', JSON.parse(localStorage.getItem('shoppingCart')));
-  } else {
-    commit('SET_SHOPPING_CART', 0);
-  }
 };
 
 // 添加注册用户

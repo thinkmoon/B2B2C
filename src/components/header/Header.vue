@@ -29,11 +29,11 @@
             <DropdownMenu slot="list">
                 <div class="my-page">
                   <div class="my-info" @click="myInfo">
-                    <Icon type="home"></Icon>
+                    <Icon type="ios-home-outline" />
                     <p>我的主页</p>
                   </div>
                   <div class="sign-out" @click="signOutFun">
-                    <Icon type="log-out"></Icon>
+                    <Icon type="ios-log-out" />
                     <p>退出登陆</p>
                   </div>
                 </div>
@@ -41,17 +41,16 @@
           </Dropdown>
         </li>
         <li>
+          <router-link to="/home/myShoppingCart">
           <Dropdown  placement="bottom-start">
-            <a href="javascript:void(0)">
-              <Icon type="ios-cart-outline"></Icon> 购物车
-            </a>
+              <Icon  type="ios-cart-outline"></Icon> 购物车
             <DropdownMenu slot="list">
-              <div class="shopping-cart-null" v-show="!shoppingCart">
+              <div class="shopping-cart-null" v-show="!shoppingCart.length">
                 <Icon type="ios-cart-outline" class="cart-null-icon"></Icon>
                 <span>你的购物车没有空空哦</span>
                 <span>赶快去添加商品吧~</span>
               </div>
-              <div class="shopping-cart-list" v-show="shoppingCart">
+              <div class="shopping-cart-list" v-show="shoppingCart.length">
                 <div class="shopping-cart-box" v-for="(item,index) in shoppingCart" :key="index">
                   <div class="shopping-cart-img">
                     <img :src="item.goods_image">
@@ -82,10 +81,12 @@
               </div>
             </DropdownMenu>
           </Dropdown>
+          </router-link>
         </li>
         <li><router-link to="/">网站导航</router-link></li>
-        <li><router-link to="/freeback">意见反馈</router-link></li>
         <li><router-link to="/">商城首页</router-link></li>
+        <li><router-link to="/freeback">意见反馈</router-link></li>
+        <li><router-link to="/Reg">我要开店</router-link></li>
       </ul>
     </div>
   </div>
@@ -98,7 +99,7 @@ export default {
   name: 'M-Header',
   mounted () {
     this.isLogin();
-    this.loadShoppingCartSync();
+    this.loadShoppingCart({user_id: this.userInfo.user_id}, this.userInfo.token);
   },
   data () {
     return {
@@ -115,7 +116,7 @@ export default {
     ...mapState(['userInfo', 'shoppingCart'])
   },
   methods: {
-    ...mapActions(['signOut', 'isLogin', 'loadShoppingCartSync', 'addCheckShoppingCart']),
+    ...mapActions(['signOut', 'isLogin', 'loadShoppingCart']),
     changeCity (city) {
       this.city = city;
     },
@@ -131,6 +132,9 @@ export default {
     signOutFun () {
       this.signOut();
       this.$router.push('/');
+    },
+    toShoppingCart () {
+      this.$router.push('/home/myShoppingCart');
     }
   },
   store

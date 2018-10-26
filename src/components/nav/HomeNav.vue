@@ -3,7 +3,9 @@
     <div class="nav-item">
       <ul>
         <li v-for="(item,index) in nav" :key="index">
-          <a href="#">{{item}}</a>
+           <router-link :to="{path:'/goodsList',query:{aim:'23'}}">
+            <a href="#">{{item}}</a>
+           </router-link>
         </li>
       </ul>
     </div>
@@ -21,7 +23,7 @@
         <div>
           <Carousel autoplay loop>
               <CarouselItem  v-for="(item, index) in marketing.CarouselItems" :key="index">
-                <router-link to="/goodsList">
+                <router-link :to="{path:'/goodsDetail',query:{id:'1'}}">
                   <img style="width: 800px; height: 485px;" :src="item">
                 </router-link>
               </CarouselItem>

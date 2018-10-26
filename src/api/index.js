@@ -1,6 +1,7 @@
 import http from './public';
 const baseUrl = '/api';
-// -------------- USER ---------------------
+// const baseUrl = '//b2b2c.bennyweb.top/api';
+// -------------- USER ---------------------n
 // 注册账号
 export const register = (params) => {
   return http.fetchPost(`${baseUrl}/user/register`, params);
@@ -40,6 +41,10 @@ export const editUserConsignee = (params, token) => {
 // 修改用户信息
 export const editProfile = (params, token) => {
   return http.fetchPost(`${baseUrl}/user/profile`, params, token);
+};
+// 用户反馈
+export const addFeedback = (params, token) => {
+  return http.fetchPost(`${baseUrl}/user/addFeedback`, params, token);
 };
 // 重置密码
 export const resetpwd = (params, token) => {
@@ -94,4 +99,40 @@ export const getOrderLists = (params, token) => {
 // 获取商品广告图
 export const getAdPictures = (params, token) => {
   return http.fetchPost(`${baseUrl}/advertisement/getAdPictures`, params, token);
+};
+// 获取订单商品
+export const getOrderInfo = (params, token) => {
+  return http.fetchPost(`${baseUrl}/goods/getOrderInfo`, params, token);
+};
+// 获取订单商品
+export const refund = (params, token) => {
+  return http.fetchPost(`${baseUrl}/goods/refund`, params, token);
+};
+// 确认收货
+export const confirmOrder = (params, token) => {
+  return http.fetchPost(`${baseUrl}/goods/confirmOrder`, params, token);
+};
+// 评价
+export const evaluate = (params, token) => {
+  return http.fetchPost(`${baseUrl}/goods/evaluate`, params, token);
+};
+// 获取评价
+export const getGoodsEvaluate = (params, token) => {
+  return http.fetchPost(`${baseUrl}/goods/getGoodsEvaluate`, params, token);
+};
+// 店铺注册
+export const registerShop = (params, token) => {
+  return http.fetchPost(`${baseUrl}/shop/register`, params, token);
+};
+// 获取订单物流信息
+export const getOrderExpress = (params, token) => {
+  return http.fetchPost(`${baseUrl}/goods/getOrderExpress`, params, token);
+};
+// 获取商品商铺信息
+export const getShopGoods = (params, token) => {
+  return http.fetchPost(`${baseUrl}/goods/getShopGoods`, params, token);
+};
+// 获取商铺商品
+export const getShopGoodsLists = (params, token) => {
+  return http.fetchPost(`${baseUrl}/goods/getShopGoodsLists`, params, token);
 };

@@ -47,7 +47,7 @@
           <div class="goods-list">
             <div class="goods-show-info" v-for="(item, index) in goodsList.data" :key="index">
               <div class="goods-show-img">
-                <router-link :to="{path:'/goodsDetail',query:{id:item.id}}" ><img :src="item.img == '' ? item.img : 'static/img/goodsList/item-show-6.jpg'"/></router-link>
+                <router-link :to="{path:'/goodsDetail',query:{id:item.id}}" ><img class="img-box" :src="item.goods_image !== '' ? item.goods_image : 'static/img/goodsList/item-show-6.jpg'"/></router-link>
               </div>
               <div class="goods-show-price">
                 <span>
@@ -56,7 +56,7 @@
                 </span>
               </div>
               <div class="goods-show-detail">
-                <span>{{item.goods_content}}</span>
+                <span>{{item.goods_intro}}</span>
               </div>
               <div class="goods-show-num">
                 已有<span>{{item.remarks}}</span>人评价
@@ -176,6 +176,10 @@ export default {
   margin: 15px auto;
   width: 93%;
   min-width: 1000px;
+}
+.img-box{
+  width: 200px;
+  height: 200px;
 }
 .text-danger {
   color: #A94442;

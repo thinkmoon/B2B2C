@@ -61,7 +61,7 @@ import GoodsListNav from '@/components/nav/GoodsListNav';
 import Footer from '@/components/footer/Footer';
 import store from '@/vuex/store';
 import { mapState, mapActions } from 'vuex';
-import { showOrder, pay } from '../api/index';
+import { showOrder, pay, getOrderInfo, getUserConsignee } from '../api/index';
 export default {
   name: 'Order',
   beforeRouteEnter (to, from, next) {
@@ -74,7 +74,16 @@ export default {
   mounted () {
     let orderId = this.$route.query.orderId;
     if (orderId) {
-
+      getOrderInfo({order_no: orderId}, this.userInfo.token).then(
+        res => {
+          this.orderInfo = res.data.order_goods;
+        }
+      );
+      getUserConsignee({user_id: this.userInfo.user_id}, this.userInfo.token).then(
+        res => {
+          this.addressData = res.data;
+        }
+      );
     } else {
       setTimeout(() => {
         showOrder({user_id: this.userInfo.user_id, goods: JSON.stringify(this.ShoppingCartCheck.goodsList)}, this.userInfo.token).then(
@@ -123,6 +132,12 @@ export default {
         },
         {
           title: '价格',
+          width: 108,
+          key: 'goods_price',
+          align: 'center'
+        },
+        {
+          title: '评价状态',
           width: 108,
           key: 'goods_price',
           align: 'center'
@@ -177,6 +192,7 @@ export default {
         res => {
           if (res.code === 1) {
             this.$Message.success('支付成功');
+            this.$router.push({path: '/home'});
           }
         }
       );

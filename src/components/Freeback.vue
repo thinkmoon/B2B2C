@@ -20,7 +20,7 @@
                   <i-input v-model="formItem.content" type="textarea" :autosize="{minRows: 8,maxRows: 10}" placeholder="请输入反馈信息"></i-input>
                 </FormItem>
                 <FormItem>
-                  <Button type="primary">提交</Button>
+                  <Button type="primary" @click="feedNew">提交</Button>
                   <Button type="ghost">清空信息</Button>
                 </FormItem>
               </Form>
@@ -35,6 +35,9 @@
 
 <script>
 import Footer from '@/components/footer/Footer';
+import store from '@/vuex/store';
+import { addFeedback } from '../api/index';
+import { mapState } from 'vuex';
 export default {
   name: 'Freeback',
   data () {
@@ -45,9 +48,27 @@ export default {
       }
     };
   },
+  computed: {
+    ...mapState(['userInfo'])
+  },
+  methods: {
+    feedNew () {
+      console.log('feed');
+      ;
+      addFeedback({user_id: this.userInfo.user_id, title: this.formItem.title, content: this.formItem.content}).then(
+        res => {
+          if (res.code === 1) {
+            this.$Message.success('谢谢您的反馈，我们会继续努力dei~');
+            this.$router.push({path: '/'});
+          }
+        }
+      );
+    }
+  },
   components: {
     Footer
-  }
+  },
+  store
 };
 </script>
 

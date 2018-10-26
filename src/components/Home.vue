@@ -57,7 +57,7 @@
     </Modal>
           <Submenu name="1">
             <template slot="title">
-                <Icon type="location"></Icon>
+                <Icon type="ios-navigate-outline" />
                 <span>收货地址</span>
             </template>
             <MenuItem name="myAddress">我的收货地址</MenuItem>
@@ -65,10 +65,11 @@
           </Submenu>
           <Submenu name="2">
             <template slot="title">
-                <Icon type="clipboard"></Icon>
+                <Icon type="md-clipboard" />
                 <span>购物订单</span>
             </template>
             <MenuItem name="myOrder">我的订单</MenuItem>
+            <MenuItem name="myExpress">物流信息</MenuItem>
           </Submenu>
           <Submenu name="3">
             <template slot="title">
@@ -118,7 +119,8 @@ export default {
         'myAddress': '我的收货地址',
         'addAddress': '添加收货地址',
         'myOrder': '我的订单',
-        'myShoppingCart': '我的购物车'
+        'myShoppingCart': '我的购物车',
+        'myExpress': '查看我的物流'
       }
     };
   },
